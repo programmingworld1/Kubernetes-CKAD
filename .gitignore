@@ -1,0 +1,28 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Kubernetes secrets / sensitive configs
+*secret*.yaml
+*secret*.yml
+secrets/
+kubeconfig
+*.kubeconfig
+
+# Helm
+charts/*.tgz
+
+# Terraform (if used alongside)
+.terraform/
+*.tfstate
+*.tfstate.backup
+
+# Temporary files
+*.tmp
+*.log
