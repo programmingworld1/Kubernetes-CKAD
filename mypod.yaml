@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: frontend
+  name: nginx
+  namespace: mynamespace
+spec:
+  containers:
+  - image: nginx
+    name: nginx
+    ports:
+    - containerPort: 80
+    livenessProbe:
+      failureThreshold: 3
+      periodSeconds: 5
+      timeoutSeconds: 1
+      initialDelaySeconds: 2
+      httpGet:
+        path: /
+        port: 80
+    readinessProbe:
+      failureThreshold: 3
+      periodSeconds: 5
+      timeoutSeconds: 1
+      initialDelaySeconds: 2
+      httpGet:
+        path: /
+        port: 80
+    volumeMounts: # this is how you mount the configmap as a volume in the container (here we define the mount in the container, and the volume is defined at the end of the file, which links to the configmap)
+    - name: config-volume
+      mountPath: /etc/config
+    - name: secret-volume
+      mountPath: /etc/secret
+    envFrom: # this is how you reference the whole configmap/secret as environment variables in the container
+    - configMapRef:
+        name: myconfigmap
+    - secretRef:
+        name: mysecret
+    env: # this is an environment variable that references only one specific key in the configmap/secret
+    - name: MYKEYfordb # this is the name of the environment variable in the container, and the value is taken from the configmap key "mykey"
+      valueFrom:
+        configMapKeyRef:
+          name: myconfigmap
+          key: mykey
+    - name: USERNAME # this is the name of the environment variable in the container,
+      valueFrom:
+        secretKeyRef:
+          name: mysecret
+          key: username
+  volumes: # this is where you define the volume that references the configmap/secret, and then you can mount it in the container as shown above. 
+  #The configmap can be used to store configuration data that can be consumed by the pods as environment variables or as files in a volume.
+  - name: config-volume
+    configMap:
+      name: myconfigmap
+  #The secret can be used to store sensitive data such as passwords, tokens, or keys, and can be consumed by the pods as environment variables or as files in a volume.
+  - name: secret-volume
+    secret:
+      secretName: mysecret

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: myconfigmap
+  namespace: mynamespace
+data:
+  mykey: myvalue # this is a simple key-value pair, each keyvaluepairis a different file in the container
+  app.properties: | # this is a multi-line value,stored as 1 file in the container
+    database=localhost
+    timeout=30
+    debug=false
