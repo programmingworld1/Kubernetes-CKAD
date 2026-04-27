@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: parallel-job-example
+spec:
+  completions: 5 # The desired number of successfully finished pods
+  parallelism: 2 # The maximum number of pods that can run in parallel
+  template:
+    spec:
+      containers:
+      - name: worker
+        image: busybox
+        command: ["sh", "-c", "echo 'Working on task $(hostname)'; sleep 10"]
+# OnFailure: the container inside the same Pod is restarted if it fails.
+# Never: the Pod is not restarted; instead, the Job creates a new Pod if needed.
+      restartPolicy: OnFailure

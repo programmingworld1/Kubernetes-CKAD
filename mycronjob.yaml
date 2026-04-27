@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: my-cron
+  namespace: mynamespace
+spec:
+  schedule: "*/1 * * * *"
+  ttlSecondsAfterFinished: 100 # the time to live for finished jobs, after which they will be automatically deleted (including their pods).
+  successfulJobsHistoryLimit: 3 # the number of successful finished jobs to retain.
+  failedJobsHistoryLimit: 1 # the number of failed finished jobs to retain.
+  startingDeadlineSeconds: 60 #  if the job doesnt run for any reason (e.g. cluster is down), it can still run within this time window. After that, it will be considered as missed and won't be executed.
+  # concurrentcyPolicy is meant to control how the CronJob should handle when the previous execution hasn't finished yet.
+  # Allow: allows CronJobs to run concurrently; 
+  # Forbid: forbids concurrent runs, skipping next run if previous run hasn't finished; 
+  # Replace: cancels currently running job and replaces it with a new one.
+  concurrencyPolicy: Allow
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: worker
+            image: busybox
+            command: ["sh", "-c", "echo hello"]
+          restartPolicy: OnFailure
